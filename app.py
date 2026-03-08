@@ -11,10 +11,13 @@ def index():
 def ask_question():
     data = request.get_json()
     question = data.get('question', '')
+    # 📖 Frontend sends conversation history with every request
+    history = data.get('history', [])
+
     if not question:
         return jsonify({'error': 'No question provided'}), 400
     try:
-        result = ask(question)
+        result = ask(question, history)
         return jsonify(result)
     except Exception as e:
         return jsonify({'error': str(e)}), 500

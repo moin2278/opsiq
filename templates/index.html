@@ -26,258 +26,78 @@
     display: flex;
     flex-direction: column;
   }
-
-  /* Header */
   header {
     border-bottom: 1px solid var(--border);
     padding: 20px 40px;
     display: flex;
     align-items: center;
     gap: 16px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
   }
-  .logo {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--accent);
-    letter-spacing: -0.5px;
-  }
+  .logo { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: var(--accent); }
   .logo span { color: var(--text); }
-  .badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    padding: 3px 10px;
-    border: 1px solid var(--accent);
-    color: var(--accent);
-    border-radius: 20px;
-    letter-spacing: 1px;
-  }
-
-  /* Main layout */
-  main {
-    flex: 1;
-    max-width: 860px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 60px 24px;
-  }
-
-  .hero {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-  .hero h1 {
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1.1;
-    margin-bottom: 14px;
-  }
-  .hero h1 em {
-    font-style: normal;
-    color: var(--accent);
-  }
-  .hero p {
-    color: var(--muted);
-    font-size: 16px;
-    line-height: 1.6;
-  }
-
-  /* Input area */
-  .input-area {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-  }
+  .badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 10px; border: 1px solid var(--accent); color: var(--accent); border-radius: 20px; letter-spacing: 1px; }
+  .memory-indicator { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .memory-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
+  .memory-dot.active { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 60px 24px; }
+  .hero { text-align: center; margin-bottom: 48px; }
+  .hero h1 { font-size: 42px; font-weight: 700; line-height: 1.1; margin-bottom: 14px; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p { color: var(--muted); font-size: 16px; line-height: 1.6; }
+  .input-area { display: flex; gap: 12px; margin-bottom: 32px; }
   input[type="text"] {
-    flex: 1;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'IBM Plex Sans', sans-serif;
-    font-size: 15px;
-    padding: 16px 20px;
-    border-radius: 6px;
-    outline: none;
-    transition: border-color 0.2s;
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px; padding: 16px 20px; border-radius: 6px; outline: none; transition: border-color 0.2s;
   }
   input[type="text"]:focus { border-color: var(--accent); }
   input[type="text"]::placeholder { color: var(--muted); }
   button {
-    background: var(--accent);
-    color: #000;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 16px 28px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    white-space: nowrap;
-    letter-spacing: 0.5px;
+    background: var(--accent); color: #000; font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight: 600; padding: 16px 28px; border: none;
+    border-radius: 6px; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;
   }
   button:hover { opacity: 0.85; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-  /* Suggestions */
-  .suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 40px;
-    justify-content: center;
-  }
+  .suggestions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; justify-content: center; }
   .suggestion {
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 12px;
-    padding: 7px 14px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'IBM Plex Mono', monospace;
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    font-size: 12px; padding: 7px 14px; border-radius: 20px; cursor: pointer;
+    transition: all 0.2s; font-family: 'IBM Plex Mono', monospace;
   }
-  .suggestion:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    background: var(--accent-dim);
-  }
-
-  /* Loading */
-  .loading {
-    display: none;
-    text-align: center;
-    padding: 48px;
-    color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-  }
+  .suggestion:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .loading { display: none; text-align: center; padding: 48px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
   .loading.active { display: block; }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 16px;
-  }
+  .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Result card */
-  .result { display: none; }
-  .result.active { display: block; }
-
-  .result-question {
-    font-size: 13px;
-    color: var(--muted);
-    font-family: 'IBM Plex Mono', monospace;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .result-question span { color: var(--accent); }
-
-  .insight-box {
-    background: var(--accent-dim);
-    border: 1px solid rgba(0,255,136,0.2);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 24px;
-  }
-  .insight-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-  }
-  .insight-text {
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--text);
-  }
-
-  .sql-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px 24px;
-    margin-bottom: 24px;
-  }
-  .sql-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    margin-bottom: 10px;
-  }
-  .sql-code {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    color: #88ccff;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .data-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  .data-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 2px;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  th {
-    text-align: left;
-    padding: 12px 20px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,0.02);
-  }
-  td {
-    padding: 11px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text);
-  }
+  .chat-turn { margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid var(--border); animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .chat-q { font-size: 13px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .turn-num { background: var(--card); border: 1px solid var(--border); color: var(--muted); font-size: 10px; padding: 2px 7px; border-radius: 3px; }
+  .insight-box { background: var(--accent-dim); border: 1px solid rgba(0,255,136,0.2); border-radius: 8px; padding: 24px; margin-bottom: 16px; }
+  .insight-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--accent); letter-spacing: 2px; margin-bottom: 10px; }
+  .insight-text { font-size: 15px; line-height: 1.7; color: var(--text); }
+  .sql-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; }
+  .sql-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 10px; }
+  .sql-code { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #88ccff; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .data-box { background: var(--card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .data-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 12px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); }
+  td { padding: 11px 20px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text); }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(255,255,255,0.02); }
-
-  .error-box {
-    background: rgba(255,68,68,0.08);
-    border: 1px solid rgba(255,68,68,0.2);
-    border-radius: 8px;
-    padding: 20px 24px;
-    color: var(--danger);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
-    display: none;
-  }
+  .clear-btn { background: transparent !important; border: 1px solid var(--border) !important; color: var(--muted) !important; font-size: 11px; padding: 8px 16px; margin-bottom: 32px; cursor: pointer; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 1px; }
+  .clear-btn:hover { border-color: var(--danger) !important; color: var(--danger) !important; }
+  .error-box { background: rgba(255,68,68,0.08); border: 1px solid rgba(255,68,68,0.2); border-radius: 8px; padding: 20px 24px; color: var(--danger); font-family: 'IBM Plex Mono', monospace; font-size: 13px; display: none; margin-bottom: 24px; }
   .error-box.active { display: block; }
-
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 20px 40px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: var(--muted);
-    text-align: center;
-    letter-spacing: 1px;
-  }
+  .empty-state { text-align: center; padding: 60px 0; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 1px; border: 1px dashed var(--border); border-radius: 8px; }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; }
+  footer { border-top: 1px solid var(--border); padding: 20px 40px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--muted); text-align: center; letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -285,12 +105,16 @@
 <header>
   <div class="logo">Ops<span>IQ</span></div>
   <div class="badge">TRANSIT AI</div>
+  <div class="memory-indicator">
+    <div class="memory-dot" id="memoryDot"></div>
+    <span id="memoryLabel">no memory</span>
+  </div>
 </header>
 
 <main>
   <div class="hero">
     <h1>Ask your operations data<br>anything in <em>plain English</em></h1>
-    <p>Powered by Claude AI · Queries live SQL · Returns analyst-grade insights</p>
+    <p>Powered by Claude AI · Queries live SQL · Remembers conversation context</p>
   </div>
 
   <div class="input-area">
@@ -314,32 +138,48 @@
 
   <div class="error-box" id="errorBox"></div>
 
-  <div class="result" id="result">
-    <div class="result-question">→ <span id="questionDisplay"></span></div>
-    <div class="insight-box">
-      <div class="insight-label">AI INSIGHT</div>
-      <div class="insight-text" id="insightText"></div>
+  <div id="resultsArea">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">⚡</div>
+      ASK A QUESTION TO GET STARTED
     </div>
-    <div class="sql-box">
-      <div class="sql-label">GENERATED SQL</div>
-      <div class="sql-code" id="sqlCode"></div>
-    </div>
-    <div class="data-box">
-      <div class="data-label">RAW DATA</div>
-      <div id="tableContainer"></div>
-    </div>
+    <div id="chatHistory"></div>
   </div>
-
 </main>
 
 <footer>OPSIQ · BUILT WITH CLAUDE AI · TRANSIT OPERATIONS INTELLIGENCE</footer>
 
 <script>
+  let conversationHistory = [];
+  let turnCount = 0;
+
   const input = document.getElementById('question');
   input.addEventListener('keydown', e => { if (e.key === 'Enter') askQuestion(); });
 
-  function setQ(q) {
-    input.value = q;
+  function setQ(q) { input.value = q; input.focus(); }
+
+  function updateMemoryIndicator() {
+    const dot = document.getElementById('memoryDot');
+    const label = document.getElementById('memoryLabel');
+    if (turnCount === 0) {
+      dot.classList.remove('active');
+      label.textContent = 'no memory';
+    } else {
+      dot.classList.add('active');
+      label.textContent = `${turnCount} turn${turnCount > 1 ? 's' : ''} in memory`;
+    }
+  }
+
+  function clearChat() {
+    conversationHistory = [];
+    turnCount = 0;
+    document.getElementById('chatHistory').innerHTML = '';
+    document.getElementById('errorBox').classList.remove('active');
+    document.getElementById('emptyState').style.display = 'block';
+    const cb = document.getElementById('clearBtn');
+    if (cb) cb.remove();
+    updateMemoryIndicator();
+    input.value = '';
     input.focus();
   }
 
@@ -349,44 +189,56 @@
 
     const btn = document.getElementById('askBtn');
     btn.disabled = true;
-
     document.getElementById('loading').classList.add('active');
-    document.getElementById('result').classList.remove('active');
     document.getElementById('errorBox').classList.remove('active');
+    document.getElementById('emptyState').style.display = 'none';
 
     try {
       const res = await fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question })
+        body: JSON.stringify({ question, history: conversationHistory })
       });
       const data = await res.json();
-
       if (data.error) throw new Error(data.error);
 
-      document.getElementById('questionDisplay').textContent = question;
-      document.getElementById('insightText').textContent = data.insight;
-      document.getElementById('sqlCode').textContent = data.sql;
+      conversationHistory = data.history;
+      turnCount++;
+      updateMemoryIndicator();
 
-      // Build table
-      const container = document.getElementById('tableContainer');
-      if (data.results && data.results.length > 0) {
-        const keys = Object.keys(data.results[0]);
-        let html = '<table><thead><tr>';
-        keys.forEach(k => html += `<th>${k}</th>`);
-        html += '</tr></thead><tbody>';
-        data.results.forEach(row => {
-          html += '<tr>';
-          keys.forEach(k => html += `<td>${row[k] ?? '—'}</td>`);
-          html += '</tr>';
-        });
-        html += '</tbody></table>';
-        container.innerHTML = html;
-      } else {
-        container.innerHTML = '<div style="padding:20px;color:var(--muted);font-family:monospace;font-size:13px;">No rows returned</div>';
+      if (turnCount === 1) {
+        const clearBtn = document.createElement('button');
+        clearBtn.id = 'clearBtn';
+        clearBtn.className = 'clear-btn';
+        clearBtn.textContent = '✕ Clear conversation';
+        clearBtn.onclick = clearChat;
+        document.getElementById('resultsArea').prepend(clearBtn);
       }
 
-      document.getElementById('result').classList.add('active');
+      const historyEl = document.getElementById('chatHistory');
+      const turn = document.createElement('div');
+      turn.className = 'chat-turn';
+      turn.innerHTML = `
+        <div class="chat-q">
+          <span class="turn-num">#${turnCount}</span>
+          → ${question}
+        </div>
+        <div class="insight-box">
+          <div class="insight-label">AI INSIGHT</div>
+          <div class="insight-text">${data.insight}</div>
+        </div>
+        <div class="sql-box">
+          <div class="sql-label">GENERATED SQL</div>
+          <div class="sql-code">${data.sql}</div>
+        </div>
+        <div class="data-box">
+          <div class="data-label">RAW DATA</div>
+          ${buildTable(data.results)}
+        </div>
+      `;
+      historyEl.appendChild(turn);
+      turn.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      input.value = '';
 
     } catch (err) {
       const box = document.getElementById('errorBox');
@@ -395,7 +247,23 @@
     } finally {
       document.getElementById('loading').classList.remove('active');
       btn.disabled = false;
+      input.focus();
     }
+  }
+
+  function buildTable(results) {
+    if (!results || results.length === 0)
+      return '<div style="padding:20px;color:var(--muted);font-family:monospace;font-size:13px;">No rows returned</div>';
+    const keys = Object.keys(results[0]);
+    let html = '<table><thead><tr>';
+    keys.forEach(k => html += `<th>${k}</th>`);
+    html += '</tr></thead><tbody>';
+    results.forEach(row => {
+      html += '<tr>';
+      keys.forEach(k => html += `<td>${row[k] ?? '—'}</td>`);
+      html += '</tr>';
+    });
+    return html + '</tbody></table>';
   }
 </script>
 </body>

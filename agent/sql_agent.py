@@ -8,7 +8,6 @@ load_dotenv()
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 DB_PATH = "database/opsiq.db"
 
-# ── STEP 1: Tell Claude what our database looks like ────────────
 SCHEMA = """
 You are an expert SQL assistant for a transit operations database.
 
@@ -36,86 +35,81 @@ Rules:
 - Always LIMIT to 20 rows unless asked for totals/counts
 """
 
-def get_schema_and_question(user_question: str) -> str:
-    """STEP 1 — Convert natural language to SQL using Claude"""
-    
+def get_sql(conversation_history: list, user_question: str) -> str:
+    """Convert natural language to SQL — with full conversation context"""
+
+    # 📖 CONCEPT: We pass the entire conversation history to Claude
+    # so it understands follow-up questions like "now filter by that station"
+    messages = conversation_history + [
+        {"role": "user", "content": user_question}
+    ]
+
     message = client.messages.create(
         model="claude-sonnet-4-20250514",
         max_tokens=500,
         system=SCHEMA,
-        messages=[
-            {"role": "user", "content": user_question}
-        ]
+        messages=messages
     )
-    
-    sql = message.content[0].text.strip()
-    return sql
-
-
-def run_sql(sql: str) -> list:
-    """STEP 2 — Execute the SQL against our real database"""
-    
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # returns dict-like rows
-    cursor = conn.cursor()
-    
-    cursor.execute(sql)
-    rows = [dict(row) for row in cursor.fetchall()]
-    conn.close()
-    
-    return rows
-
-
-def explain_results(user_question: str, sql: str, results: list) -> str:
-    """STEP 3 — Claude explains the results in plain English"""
-    
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=500,
-        system="You are an operations analyst. Given a question, the SQL used, and the results, write a clear 2-4 sentence insight. Be specific with numbers. Sound like a smart analyst, not a chatbot.",
-        messages=[
-            {"role": "user", "content": f"""
-Question: {user_question}
-
-SQL Used: {sql}
-
-Results: {results}
-
-Write your insight:
-"""}
-        ]
-    )
-    
     return message.content[0].text.strip()
 
 
-def ask(question: str) -> dict:
-    """The main function — ties all 3 steps together"""
-    
-    print(f"\n🔍 Question: {question}")
-    
-    # Step 1: Natural language → SQL
-    sql = get_schema_and_question(question)
-    print(f"📝 SQL Generated:\n{sql}")
-    
+def run_sql(sql: str) -> list:
+    """Execute SQL against the database"""
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    rows = [dict(row) for row in cursor.fetchall()]
+    conn.close()
+    return rows
+
+
+def explain_results(conversation_history: list, user_question: str, sql: str, results: list) -> str:
+    """Explain results in plain English — aware of conversation context"""
+
+    messages = conversation_history + [
+        {"role": "user", "content": f"""
+Question: {user_question}
+SQL Used: {sql}
+Results: {results}
+
+Write a clear 2-4 sentence insight. Be specific with numbers.
+Reference previous context if this is a follow-up question.
+"""}
+    ]
+
+    message = client.messages.create(
+        model="claude-sonnet-4-20250514",
+        max_tokens=500,
+        system="You are an operations analyst. Give sharp, specific insights. Sound like a smart analyst, not a chatbot.",
+        messages=messages
+    )
+    return message.content[0].text.strip()
+
+
+def ask(question: str, conversation_history: list) -> dict:
+    """Main function — takes question + history, returns result + updated history"""
+
+    # Step 1: Natural language → SQL (with memory)
+    sql = get_sql(conversation_history, question)
+
     # Step 2: Run SQL
     results = run_sql(sql)
-    print(f"📊 Rows returned: {len(results)}")
-    
-    # Step 3: Explain results
-    insight = explain_results(question, sql, results)
-    print(f"💡 Insight:\n{insight}")
-    
+
+    # Step 3: Explain results (with memory)
+    insight = explain_results(conversation_history, question, sql, results)
+
+    # 📖 CONCEPT: We append both the question AND answer to history
+    # This is how all LLM chat memory works — it's just a growing list
+    updated_history = conversation_history + [
+        {"role": "user", "content": question},
+        {"role": "assistant", "content": f"SQL: {sql}\nResults: {results}\nInsight: {insight}"}
+    ]
+
     return {
         "question": question,
         "sql": sql,
         "results": results,
-        "insight": insight
+        "insight": insight,
+        "history": updated_history  # pass this back to the frontend
     }
-
-
-# ── TEST IT ─────────────────────────────────────────────────────
-if __name__ == "__main__":
-    ask("What are the most common incident types?")
-    ask("Which station has the most unresolved incidents?")
-    ask("What is the average resolution time for critical incidents?")
