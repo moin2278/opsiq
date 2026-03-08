@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpsIQ — Transit Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #00ff88;
+    --accent-dim: rgba(0,255,136,0.1);
+    --text: #e8e8e8;
+    --muted: #555;
+    --danger: #ff4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--text); }
+  .badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  /* Main layout */
+  main {
+    flex: 1;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 60px 24px;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 14px;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Input area */
+  .input-area {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  input[type="text"] {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"]::placeholder { color: var(--muted); }
+  button {
+    background: var(--accent);
+    color: #000;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 16px 28px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+  }
+  button:hover { opacity: 0.85; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Suggestions */
+  .suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+    justify-content: center;
+  }
+  .suggestion {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .suggestion:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* Loading */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 48px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+  }
+  .loading.active { display: block; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Result card */
+  .result { display: none; }
+  .result.active { display: block; }
+
+  .result-question {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .result-question span { color: var(--accent); }
+
+  .insight-box {
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,255,136,0.2);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .insight-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .insight-text {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+
+  .sql-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .sql-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .sql-code {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: #88ccff;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .data-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .data-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    text-align: left;
+    padding: 12px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+  td {
+    padding: 11px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .error-box {
+    background: rgba(255,68,68,0.08);
+    border: 1px solid rgba(255,68,68,0.2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    color: var(--danger);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    display: none;
+  }
+  .error-box.active { display: block; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 40px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Ops<span>IQ</span></div>
+  <div class="badge">TRANSIT AI</div>
+</header>
+
+<main>
+  <div class="hero">
+    <h1>Ask your operations data<br>anything in <em>plain English</em></h1>
+    <p>Powered by Claude AI · Queries live SQL · Returns analyst-grade insights</p>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="question" placeholder="e.g. Which station has the most critical incidents?" />
+    <button id="askBtn" onclick="askQuestion()">ASK →</button>
+  </div>
+
+  <div class="suggestions">
+    <div class="suggestion" onclick="setQ('What are the most common incident types?')">most common incidents</div>
+    <div class="suggestion" onclick="setQ('Which station has the worst device uptime?')">worst device uptime</div>
+    <div class="suggestion" onclick="setQ('What is the average resolution time by severity?')">resolution by severity</div>
+    <div class="suggestion" onclick="setQ('Which technician completed the most maintenance tasks?')">top technician</div>
+    <div class="suggestion" onclick="setQ('How many critical incidents are still unresolved?')">unresolved critical</div>
+    <div class="suggestion" onclick="setQ('What percentage of incidents were resolved?')">resolution rate</div>
+  </div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    Generating SQL · Querying database · Analyzing results...
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="result" id="result">
+    <div class="result-question">→ <span id="questionDisplay"></span></div>
+    <div class="insight-box">
+      <div class="insight-label">AI INSIGHT</div>
+      <div class="insight-text" id="insightText"></div>
+    </div>
+    <div class="sql-box">
+      <div class="sql-label">GENERATED SQL</div>
+      <div class="sql-code" id="sqlCode"></div>
+    </div>
+    <div class="data-box">
+      <div class="data-label">RAW DATA</div>
+      <div id="tableContainer"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>OPSIQ · BUILT WITH CLAUDE AI · TRANSIT OPERATIONS INTELLIGENCE</footer>
+
+<script>
+  const input = document.getElementById('question');
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') askQuestion(); });
+
+  function setQ(q) {
+    input.value = q;
+    input.focus();
+  }
+
+  async function askQuestion() {
+    const question = input.value.trim();
+    if (!question) return;
+
+    const btn = document.getElementById('askBtn');
+    btn.disabled = true;
+
+    document.getElementById('loading').classList.add('active');
+    document.getElementById('result').classList.remove('active');
+    document.getElementById('errorBox').classList.remove('active');
+
+    try {
+      const res = await fetch('/ask', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+
+      if (data.error) throw new Error(data.error);
+
+      document.getElementById('questionDisplay').textContent = question;
+      document.getElementById('insightText').textContent = data.insight;
+      document.getElementById('sqlCode').textContent = data.sql;
+
+      // Build table
+      const container = document.getElementById('tableContainer');
+      if (data.results && data.results.length > 0) {
+        const keys = Object.keys(data.results[0]);
+        let html = '<table><thead><tr>';
+        keys.forEach(k => html += `<th>${k}</th>`);
+        html += '</tr></thead><tbody>';
+        data.results.forEach(row => {
+          html += '<tr>';
+          keys.forEach(k => html += `<td>${row[k] ?? '—'}</td>`);
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      } else {
+        container.innerHTML = '<div style="padding:20px;color:var(--muted);font-family:monospace;font-size:13px;">No rows returned</div>';
+      }
+
+      document.getElementById('result').classList.add('active');
+
+    } catch (err) {
+      const box = document.getElementById('errorBox');
+      box.textContent = '⚠ ' + err.message;
+      box.classList.add('active');
+    } finally {
+      document.getElementById('loading').classList.remove('active');
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>
