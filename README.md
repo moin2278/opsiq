@@ -112,4 +112,4 @@ This project was inspired by my work at the **Metropolitan Transportation Author
 
 ---
 
-Built by [Moin Hasan](https://linkedin.com/in/YOUR_LINKEDIN) · [LinkedIn](https://linkedin.com/in/YOUR_LINKEDIN)
+Built by [Moin Hasan](https://www.linkedin.com/in/moinhhasan/) · [LinkedIn](https://www.linkedin.com/in/moinhhasan/)
