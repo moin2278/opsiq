@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: opsiq
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python database/seed.py
+    startCommand: gunicorn app:app
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
